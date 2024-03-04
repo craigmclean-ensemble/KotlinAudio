@@ -233,6 +233,7 @@ abstract class BaseAudioPlayer internal constructor(
             if (playerConfig.interceptPlayerActionsTriggeredExternally) createForwardingPlayer() else exoPlayer
 
         mediaSession.setCallback(object: MediaSessionCompat.Callback() {
+
             override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
                 if (mediaButtonEvent?.action == Intent.ACTION_MEDIA_BUTTON) {
                     val event = mediaButtonEvent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
@@ -245,7 +246,16 @@ abstract class BaseAudioPlayer internal constructor(
                             KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
                                 this.onSkipToPrevious()
                                 return true
-                            } else -> {
+                            }
+                            KeyEvent.KEYCODE_MEDIA_PLAY -> {
+                            this.onPlay()
+                            return true
+                            }
+                            KeyEvent.KEYCODE_MEDIA_PAUSE -> {
+                            this.onPause()
+                            return true
+                            } 
+                            else -> {
                             }
                         }
                     }
@@ -258,6 +268,14 @@ abstract class BaseAudioPlayer internal constructor(
             }
             override fun onSkipToPrevious() {
                 playerToUse.seekToPrevious()
+            }
+
+            override fun onPlay() {
+                playerToUse.play()
+            }
+
+            override fun onPause() {
+                playerToUse.pause()
             }
         })
 
