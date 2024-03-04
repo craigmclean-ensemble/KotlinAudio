@@ -252,6 +252,13 @@ abstract class BaseAudioPlayer internal constructor(
                 }
                 return super.onMediaButtonEvent(mediaButtonEvent)
             }
+
+            override fun onSkipToNext() {
+                playerToUse.seekToNext()
+            }
+            override fun onSkipToPrevious() {
+                playerToUse.seekToPrevious()
+            }
         })
 
         notificationManager = NotificationManager(
