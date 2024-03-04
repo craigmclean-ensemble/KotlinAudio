@@ -252,7 +252,7 @@ abstract class BaseAudioPlayer internal constructor(
                 }
                 return super.onMediaButtonEvent(mediaButtonEvent)
             }
-        }
+        })
 
         notificationManager = NotificationManager(
             context,
