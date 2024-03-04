@@ -289,6 +289,19 @@ abstract class BaseAudioPlayer internal constructor(
             override fun onSeekTo(pos: Long) {
                 playerToUse.seekTo(pos)
             }
+            // see NotificationManager.kt. onRewind, onFastForward and onStop do not trigger.
+            override fun onCustomAction(action: String?, extras: Bundle?) {
+                when (action) {
+                    NotificationManager.REWIND -> playerToUse.seekBack()
+                    NotificationManager.FORWARD -> playerToUse.seekForward()
+                    NotificationManager.STOP-> playerToUse.stop()
+                    else -> playerEventHolder.updateOnPlayerActionTriggeredExternally(
+                            MediaSessionCallback.CUSTOMACTION(
+                                action ?: "NO_ACTION_CODE_PROVIDED"
+                            )
+                        )
+                }
+            }
         })
 
         notificationManager = NotificationManager(
