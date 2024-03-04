@@ -277,6 +277,18 @@ abstract class BaseAudioPlayer internal constructor(
             override fun onPause() {
                 playerToUse.pause()
             }
+            override fun onFastForward() {
+                playerToUse.seekForward()
+            }
+            override fun onRewind() {
+                playerToUse.seekBack()
+            }
+            override fun onStop() {
+                playerToUse.stop()
+            }
+            override fun onSeekTo(pos: Long) {
+                playerToUse.seekTo(pos)
+            }
         })
 
         notificationManager = NotificationManager(
