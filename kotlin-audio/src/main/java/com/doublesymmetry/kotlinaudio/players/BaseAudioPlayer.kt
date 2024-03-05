@@ -3,11 +3,13 @@ package com.doublesymmetry.kotlinaudio.players
 import android.content.Context
 import android.media.AudioManager
 import android.media.AudioManager.AUDIOFOCUS_LOSS
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
+import android.view.KeyEvent
 import androidx.annotation.CallSuper
 import androidx.core.content.ContextCompat
 import androidx.media.AudioAttributesCompat
@@ -195,6 +197,73 @@ abstract class BaseAudioPlayer internal constructor(
 
         val playerToUse =
             if (playerConfig.interceptPlayerActionsTriggeredExternally) createForwardingPlayer() else exoPlayer
+
+        mediaSession.setCallback(object: MediaSessionCompat.Callback() {
+            override fun onMediaButtonEvent(mediaButtonEvent: Intent?): Boolean {
+                if (mediaButtonEvent?.action == Intent.ACTION_MEDIA_BUTTON) {
+                    val event = mediaButtonEvent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
+                    if (event != null && event.action == KeyEvent.ACTION_DOWN) {
+                        when (event.keyCode) {
+                            KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                                this.onSkipToNext()
+                                return true
+                            }
+                            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                                this.onSkipToPrevious()
+                                return true
+                            }
+                            KeyEvent.KEYCODE_MEDIA_PLAY -> {
+                            this.onPlay()
+                            return true
+                            }
+                            KeyEvent.KEYCODE_MEDIA_PAUSE -> {
+                            this.onPause()
+                            return true
+                            } 
+                            else -> {
+                            }
+                        }
+                    }
+                }
+                return super.onMediaButtonEvent(mediaButtonEvent)
+            }
+
+            override fun onSkipToNext() {
+                playerToUse.seekToNext()
+            }
+            override fun onSkipToPrevious() {
+                playerToUse.seekToPrevious()
+            }
+
+            override fun onPlay() {
+                playerToUse.play()
+            }
+
+            override fun onPause() {
+                playerToUse.pause()
+            }
+            override fun onFastForward() {
+                playerToUse.seekForward()
+            }
+            override fun onRewind() {
+                playerToUse.seekBack()
+            }
+            override fun onStop() {
+                playerToUse.stop()
+            }
+            override fun onSeekTo(pos: Long) {
+                playerToUse.seekTo(pos)
+            }
+            // see NotificationManager.kt. onRewind, onFastForward and onStop do not trigger.
+            override fun onCustomAction(action: String?, extras: Bundle?) {
+                when (action) {
+                    NotificationManager.REWIND -> playerToUse.seekBack()
+                    NotificationManager.FORWARD -> playerToUse.seekForward()
+                    NotificationManager.STOP-> playerToUse.stop()
+                }
+            }
+        })
+
 
         notificationManager = NotificationManager(
             context,
